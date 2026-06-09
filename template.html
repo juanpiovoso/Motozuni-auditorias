@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motozuni · Auditorías</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F0EEE9;
+  --card: #FAFAF8;
+  --border: #E2DED6;
+  --text-primary: #1A1916;
+  --text-secondary: #6B6760;
+  --text-tertiary: #A39F97;
+  --accent: #1A3FDB;
+  --green: #1A6B3A;
+  --green-bg: #E8F5EE;
+  --red: #B91C1C;
+  --red-bg: #FEF2F2;
+  --yellow: #92400E;
+  --yellow-bg: #FFFBEB;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+/* TOPBAR */
+.topbar { background: var(--text-primary); padding: 0 2rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.topbar-brand { font-size: 13px; font-weight: 600; color: #fff; letter-spacing: 1.5px; text-transform: uppercase; }
+.topbar-label { font-size: 11px; color: #888; font-family: 'DM Mono', monospace; }
+
+/* SELECTOR BAR — desplegable */
+.selector-bar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 1rem; height: 52px; }
+.sel-label { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; white-space: nowrap; }
+.sel-select {
+  padding: 6px 32px 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23A39F97'/%3E%3C/svg%3E") no-repeat right 12px center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 160px;
+}
+.sel-select:focus { border-color: var(--accent); }
+
+/* LAYOUT */
+.content-wrap { display: flex; gap: 0; max-width: 1100px; margin: 0 auto; }
+
+/* SIDEBAR VISITAS */
+.visitas-sidebar {
+  display: none;
+  width: 150px;
+  flex-shrink: 0;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 1.25rem 0;
+  min-height: calc(100vh - 108px);
+  position: sticky;
+  top: 56px;
+  align-self: flex-start;
+  overflow-y: auto;
+}
+.visitas-sidebar.visible { display: block; }
+.sidebar-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.9px; color: var(--text-tertiary); padding: 0 1rem 10px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.visita-btn {
+  display: flex; flex-direction: column;
+  width: 100%; padding: 10px 1rem;
+  border: none; background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; text-align: left;
+  border-left: 3px solid transparent;
+  transition: all 0.12s;
+  gap: 3px;
+}
+.visita-btn:hover { background: var(--bg); }
+.visita-btn.active { border-left-color: var(--accent); background: var(--bg); }
+.visita-fecha { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.visita-score { font-size: 11px; font-family: 'DM Mono', monospace; }
+
+/* MAIN */
+.main { padding: 1.5rem 2rem 3rem; flex: 1; min-width: 0; }
+
+/* KPI strip */
+.kpi-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1.5rem; }
+.kpi-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.kpi-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 5px; }
+.kpi-val { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.kpi-val.green { color: var(--green); }
+.kpi-val.yellow { color: var(--yellow); }
+.kpi-val.red { color: var(--red); }
+.kpi-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+
+/* RESUMEN GRID */
+.resumen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.resumen-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+.resumen-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(26,63,219,0.1); }
+.res-local { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.res-meta { font-size: 11px; color: var(--text-tertiary); font-family: 'DM Mono', monospace; margin-bottom: 10px; }
+
+/* Historial de scores en tarjeta resumen */
+.res-historial { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 10px; }
+.res-hist-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.res-hist-score { font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.res-hist-fecha { font-size: 9px; color: var(--text-tertiary); }
+.res-hist-sep { width: 1px; height: 28px; background: var(--border); align-self: center; }
+
+.res-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
+.res-bar-fill { height: 100%; border-radius: 2px; }
+.res-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 10px; font-family: 'DM Mono', monospace; }
+.tag-green { background: var(--green-bg); color: var(--green); }
+.tag-yellow { background: var(--yellow-bg); color: var(--yellow); }
+.tag-red { background: var(--red-bg); color: var(--red); }
+
+/* DETALLE */
+#view-detalle { display: none; }
+
+.header-card { background: var(--text-primary); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.header-meta { display: flex; flex-direction: column; gap: 4px; }
+.header-sucursal { font-size: 22px; font-weight: 600; color: #fff; }
+.header-sub { font-size: 12px; color: #888; font-family: 'DM Mono', monospace; }
+.header-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.badge-green { background: #14532D; color: #4ADE80; }
+.badge-yellow { background: #78350F; color: #FCD34D; }
+.badge-red { background: #7F1D1D; color: #FCA5A5; }
+.score-circle { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #333; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.score-num-big { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; line-height: 1; }
+.score-den { font-size: 10px; color: #666; margin-top: 2px; }
+.score-lbl { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 3px; }
+
+/* Card */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; }
+.card-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.9px; color: var(--text-tertiary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.card-title::before { content: ''; width: 3px; height: 12px; background: var(--accent); border-radius: 2px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+
+/* SECTOR CARD — ítem + observación */
+.sector-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+.sector-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.9px; color: var(--text-tertiary); margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+.sector-title-left { display: flex; align-items: center; gap: 8px; }
+.sector-title-left::before { content: ''; width: 3px; height: 12px; background: var(--accent); border-radius: 2px; }
+.sector-badge { font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 10px; font-family: 'DM Mono', monospace; }
+
+.item-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px; }
+.item-row:last-child { margin-bottom: 0; }
+.item-row.ok { background: var(--green-bg); }
+.item-row.no { background: var(--red-bg); }
+.item-row.nd { background: #F5F4F0; }
+.item-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.item-content { flex: 1; min-width: 0; }
+.item-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+.item-obs { font-size: 11px; color: var(--text-secondary); font-style: italic; margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(0,0,0,0.06); }
+.item-pts { font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 600; flex-shrink: 0; white-space: nowrap; }
+.pts-ok { color: var(--green); }
+.pts-no { color: var(--red); }
+.pts-nd { color: var(--text-tertiary); }
+
+/* Stock */
+.stock-totals { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 1rem; }
+.stock-total-item { background: #F5F4F0; border-radius: 8px; padding: 10px 12px; text-align: center; }
+.stot-num { font-size: 22px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text-primary); }
+.stot-num.red { color: var(--red); }
+.stot-num.yellow { color: #D97706; }
+.stot-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
+
+.stock-table { width: 100%; border-collapse: collapse; }
+.stock-table th { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-tertiary); text-align: left; padding: 0 8px 8px; border-bottom: 1px solid var(--border); }
+.stock-table td { padding: 9px 8px; font-size: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.stock-table tr:last-child td { border-bottom: none; }
+.chasis { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-secondary); }
+.obs-tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 500; }
+.tag-pending { background: var(--yellow-bg); color: var(--yellow); }
+
+.page-footer { text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 2rem; font-family: 'DM Mono', monospace; }
+.empty-state { text-align: center; padding: 3rem; color: var(--text-tertiary); font-size: 13px; }
+
+@media(max-width:700px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .main { padding: 1rem; }
+  .stock-totals { grid-template-columns: repeat(2,1fr); }
+  .kpi-strip { grid-template-columns: repeat(2,1fr); }
+  .selector-bar { padding: 0 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-brand">Motozuni · Auditorías</span>
+  <span class="topbar-label" id="topDate"></span>
+</div>
+
+<div class="selector-bar">
+  <span class="sel-label">Local</span>
+  <select class="sel-select" id="sel-locales" onchange="onSelectLocal(this.value)">
+    <option value="todos">Todos los locales</option>
+  </select>
+</div>
+
+<div class="content-wrap">
+
+  <div class="visitas-sidebar" id="visitas-sidebar">
+    <div class="sidebar-label">Visitas</div>
+    <div id="visitas-list"></div>
+  </div>
+
+  <div class="main">
+    <div id="view-resumen">
+      <div class="kpi-strip" id="kpi-strip"></div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-tertiary);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);" id="sec-lbl">Todos los locales</div>
+      <div class="resumen-grid" id="resumen-grid"></div>
+    </div>
+
+    <div id="view-detalle"></div>
+
+    <div class="page-footer">Motozuni · Control de Sucursales · 2026</div>
+  </div>
+
+</div>
+
+<script>
+// ============ DATOS ============
+const SECTORES = {
+  'Caja':             ['Control de billetes contra caja','Cobros registrados en Presea','Gastos menores pasados en Presea y planilla Drive'],
+  'Motos':            ['Control sistema vs inventario físico (Marca/Modelo)'],
+  'Accesorios':       ['Control sistema vs inventario físico'],
+  'Orden del Sector': ['Carpetas físicas (remitos, recepciones ordenadas)','Conteo de chapas'],
+  'Legajo Clientes':  ['Calculadores y recalculadores','Documentación respaldatoria (créditos, transferencias)','Asientos del legajo en sistema','Señas de motos'],
+  'Prendas':          ['Estado de prendas (no transcripta, no liquidada)'],
+};
+
+const PUNTAJES_MAP = {
+  'Control de billetes contra caja': 3,
+  'Cobros registrados en Presea': 2,
+  'Gastos menores pasados en Presea y planilla Drive': 2,
+  'Control sistema vs inventario físico (Marca/Modelo)': 5,
+  'Control sistema vs inventario físico': 2,
+  'Carpetas físicas (remitos, recepciones ordenadas)': 1,
+  'Conteo de chapas': 1,
+  'Calculadores y recalculadores': 2,
+  'Documentación respaldatoria (créditos, transferencias)': 2,
+  'Asientos del legajo en sistema': 2,
+  'Señas de motos': 2,
+  'Estado de prendas (no transcripta, no liquidada)': 2,
+};
+
+// Orden canónico de ítems (igual al script)
+const ITEMS_FULL = [
+  'Control de billetes contra caja',
+  'Cobros registrados en Presea',
+  'Gastos menores pasados en Presea y planilla Drive',
+  'Control sistema vs inventario físico (Marca/Modelo)',
+  'Control sistema vs inventario físico',
+  'Carpetas físicas (remitos, recepciones ordenadas)',
+  'Conteo de chapas',
+  'Calculadores y recalculadores',
+  'Documentación respaldatoria (créditos, transferencias)',
+  'Asientos del legajo en sistema',
+  'Señas de motos',
+  'Estado de prendas (no transcripta, no liquidada)',
+];
+
+// ===DATA_START===
+const DATA = [];
+// ===DATA_END===
+
+// ============ ESTADO ============
+let selLocal = 'todos';
+let selFecha = null;
+
+// ============ HELPERS ============
+function fmtF(f){ const d=new Date(f+'T12:00:00'); return d.getDate().toString().padStart(2,'0')+'/'+((d.getMonth()+1)+'').padStart(2,'0'); }
+function fmtFull(f){ const d=new Date(f+'T12:00:00'); return d.getDate().toString().padStart(2,'0')+'/'+((d.getMonth()+1)+'').padStart(2,'0')+'/'+d.getFullYear(); }
+function scoreColor(s){ return s>=9?'var(--green)':s>=7?'var(--yellow)':'var(--red)'; }
+function scoreCls(s){ return s>=9?'green':s>=7?'yellow':'red'; }
+function scoreTagCls(s){ return s>=9?'tag-green':s>=7?'tag-yellow':'tag-red'; }
+function scoreTagTxt(s){ return s>=9?'En orden':s>=7?'Revisar':'Atención'; }
+function getLocales(){ return [...new Set(DATA.map(d=>d.sucursal))].sort(); }
+function getFechasLocal(local){ return [...new Set(DATA.filter(d=>d.sucursal===local).map(d=>d.fecha))].sort((a,b)=>new Date(b)-new Date(a)); }
+function getAuditoria(local,fecha){ return DATA.find(d=>d.sucursal===local&&d.fecha===fecha); }
+
+// ============ BUILD SELECT ============
+function buildSelect(){
+  const sel = document.getElementById('sel-locales');
+  getLocales().forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l; opt.textContent = l;
+    sel.appendChild(opt);
+  });
+}
+
+function onSelectLocal(val){
+  selLocal = val;
+  selFecha = null;
+  const sidebar = document.getElementById('visitas-sidebar');
+  const vList = document.getElementById('visitas-list');
+
+  if(val === 'todos'){
+    sidebar.classList.remove('visible');
+    vList.innerHTML = '';
+    renderResumen();
+  } else {
+    const fechas = getFechasLocal(val);
+    vList.innerHTML = fechas.map((f,i) => {
+      const row = DATA.find(d=>d.sucursal===val&&d.fecha===f);
+      return `<button class="visita-btn${i===0?' active':''}" onclick="setFecha('${f}',this)">
+        <span class="visita-fecha">${fmtFull(f)}</span>
+        <span class="visita-score" style="color:${row?scoreColor(row.score):'var(--text-tertiary)'}">${row?row.score:''}/10</span>
+      </button>`;
+    }).join('');
+    sidebar.classList.add('visible');
+    selFecha = fechas[0];
+    renderDetalle(val, fechas[0]);
+  }
+}
+
+function setFecha(fecha, btn){
+  selFecha = fecha;
+  document.querySelectorAll('#visitas-list .visita-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDetalle(selLocal, fecha);
+}
+
+// ============ RENDER RESUMEN ============
+function renderResumen(){
+  document.getElementById('view-resumen').style.display='block';
+  document.getElementById('view-detalle').style.display='none';
+
+  const locales = getLocales();
+  const total = DATA.length;
+  const prom = (DATA.reduce((s,d)=>s+d.score,0)/total).toFixed(1);
+  const nc = DATA.reduce((s,d)=>s+d.items.filter(v=>v==='NO').length,0);
+  const bajos = DATA.filter(d=>d.score<7).length;
+
+  document.getElementById('kpi-strip').innerHTML = `
+    <div class="kpi-box"><div class="kpi-lbl">Auditorías</div><div class="kpi-val">${total}</div><div class="kpi-sub">${locales.length} locales</div></div>
+    <div class="kpi-box"><div class="kpi-lbl">Score promedio</div><div class="kpi-val ${scoreCls(parseFloat(prom))}">${prom}</div><div class="kpi-sub">red general</div></div>
+    <div class="kpi-box"><div class="kpi-lbl">No conformes</div><div class="kpi-val ${nc>10?'red':nc>4?'yellow':'green'}">${nc}</div><div class="kpi-sub">ítems con desvío</div></div>
+    <div class="kpi-box"><div class="kpi-lbl">Scores bajos</div><div class="kpi-val ${bajos>3?'red':bajos>0?'yellow':'green'}">${bajos}</div><div class="kpi-sub">score &lt; 7</div></div>
+  `;
+
+  document.getElementById('sec-lbl').textContent = `${locales.length} locales`;
+
+  document.getElementById('resumen-grid').innerHTML = locales.map(local => {
+    const rows = DATA.filter(d=>d.sucursal===local).sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+    const prom = (rows.reduce((s,d)=>s+d.score,0)/rows.length).toFixed(1);
+    const pct = (parseFloat(prom)/10*100).toFixed(0);
+
+    // Historial de scores (máx 4 visitas)
+    const histShown = rows.slice(0,4).reverse();
+    const histHTML = histShown.map((r,i) => `
+      <div class="res-hist-item">
+        <div class="res-hist-score" style="color:${scoreColor(r.score)}">${r.score}</div>
+        <div class="res-hist-fecha">${fmtF(r.fecha)}</div>
+      </div>
+      ${i<histShown.length-1?'<div class="res-hist-sep"></div>':''}`
+    ).join('');
+
+    return `
+    <div class="resumen-card" onclick="clickLocalCard('${local}')">
+      <div class="res-local">${local}</div>
+      <div class="res-meta">${rows.length} visita${rows.length!==1?'s':''}${rows[0].general?' · Gral: '+rows[0].general:rows[0].encargado?' · Enc: '+rows[0].encargado:''}</div>
+      <div class="res-historial">${histHTML}</div>
+      <div class="res-bar"><div class="res-bar-fill" style="width:${pct}%;background:${scoreColor(parseFloat(prom))}"></div></div>
+      <span class="res-tag ${scoreTagCls(parseFloat(prom))}">${scoreTagTxt(parseFloat(prom))}</span>
+    </div>`;
+  }).join('');
+}
+
+function clickLocalCard(local){
+  const sel = document.getElementById('sel-locales');
+  sel.value = local;
+  onSelectLocal(local);
+}
+
+// ============ RENDER DETALLE ============
+function renderDetalle(local, fecha){
+  document.getElementById('view-resumen').style.display='none';
+  const vd = document.getElementById('view-detalle');
+  vd.style.display='block';
+
+  const d = getAuditoria(local, fecha);
+  if(!d){ vd.innerHTML='<div class="empty-state">No se encontró la auditoría.</div>'; return; }
+
+  // Mapa item -> {val, obs}
+  const itemMap = {};
+  ITEMS_FULL.forEach((item,i) => { itemMap[item] = { val: d.items[i], obs: d.obs[i] }; });
+
+  // Status por sector
+  const sectorStatus = {};
+  for(const [sec, items] of Object.entries(SECTORES)){
+    sectorStatus[sec] = items.every(item => itemMap[item]?.val !== 'NO') ? 'ok' : 'no';
+  }
+
+  const badgesHTML = Object.entries(sectorStatus).map(([sec,st])=>
+    `<span class="badge badge-${st==='ok'?'green':'yellow'}">${sec} ${st==='ok'?'✓':'✗'}</span>`
+  ).join('');
+
+  const circleColor = d.score>=9?'#4ADE80':d.score>=7?'#FCD34D':'#FCA5A5';
+
+  // Sectores con ítems y observaciones
+  let sectoresHTML = '';
+  for(const [sec, items] of Object.entries(SECTORES)){
+    const st = sectorStatus[sec];
+    const itemsHTML = items.map(item => {
+      const {val, obs} = itemMap[item] || {val:'', obs:''};
+      const rowCls = val==='SI'?'ok':val==='NO'?'no':'nd';
+      const icon = val==='SI'?'✓':val==='NO'?'✗':'—';
+      const ptsFull = PUNTAJES_MAP[item]||0;
+      const ptsGot = val==='SI'?ptsFull:0;
+      const ptsCls = val==='SI'?'pts-ok':val==='NO'?'pts-no':'pts-nd';
+      return `
+      <div class="item-row ${rowCls}">
+        <div class="item-icon">${icon}</div>
+        <div class="item-content">
+          <div class="item-name">${item}</div>
+          ${obs?`<div class="item-obs">${obs}</div>`:''}
+        </div>
+        <div class="item-pts ${ptsCls}">${val==='SI'?ptsFull:val==='NO'?'0':'—'}/${ptsFull}</div>
+      </div>`;
+    }).join('');
+
+    sectoresHTML += `
+    <div class="sector-card">
+      <div class="sector-title">
+        <div class="sector-title-left">${sec}</div>
+        <span class="sector-badge ${st==='ok'?'tag-green':'tag-red'}">${st==='ok'?'CONFORME':'NO CONFORME'}</span>
+      </div>
+      ${itemsHTML}
+    </div>`;
+  }
+
+  // Stock
+  const stNum = (v,cls) => v!=null ? `<div class="stot-num ${cls}">${v}</div>` : `<div class="stot-num" style="color:var(--text-tertiary)">—</div>`;
+  const fisico = d.stockPresea!=null && d.motosFuera!=null ? d.stockPresea+d.motosFuera : null;
+
+  const motosHTML = d.motos && d.motos.length ? `
+  <div class="card" style="margin-bottom:1rem">
+    <div class="card-title">Detalle stock motos (${d.motos.length} unidades)</div>
+    <table class="stock-table">
+      <thead><tr><th>Modelo</th><th>Chasis</th><th>Cliente</th><th>Estado</th></tr></thead>
+      <tbody>${d.motos.map(m=>`<tr><td><strong>${m.desc}</strong></td><td class="chasis">${m.chasis}</td><td>${m.cliente}</td><td><span class="obs-tag tag-pending">${m.obs}</span></td></tr>`).join('')}</tbody>
+    </table>
+  </div>` : '';
+
+  vd.innerHTML = `
+  <div class="header-card">
+    <div class="header-meta">
+      <div class="header-sucursal">${d.sucursal}</div>
+      <div class="header-sub">Supervisor: ${d.supervisor}${d.encargado?' · Auditado: '+d.encargado:''} · ${fmtFull(d.fecha)}</div>
+      ${(d.general||d.asistentes)?'<div class="header-sub" style="margin-top:3px">'+( d.general?'General: '+d.general:'')+(d.asistentes?' &nbsp;·&nbsp; Asistentes: '+d.asistentes:'')+'</div>':''}
+      <div class="header-badges">${badgesHTML}</div>
+    </div>
+    <div class="score-circle">
+      <div class="score-num-big" style="color:${circleColor}">${d.score}</div>
+      <div class="score-den">sobre 10</div>
+      <div class="score-lbl">Score</div>
+    </div>
+  </div>
+
+  <div class="card grid-2" style="margin-bottom:1rem;align-items:start">
+    <div>
+      <div class="card-title">Stock de motos</div>
+      <div class="stock-totals" style="margin-top:0">
+        <div class="stock-total-item">${stNum(d.stockPresea,'')}<div class="stot-label">Stock Presea</div></div>
+        <div class="stock-total-item">${stNum(fisico,'')}<div class="stot-label">Físico</div></div>
+        <div class="stock-total-item">${stNum(d.motosFuera,'yellow')}<div class="stot-label">Fuera stock</div></div>
+        <div class="stock-total-item">${stNum(d.motosSinFisico,'red')}<div class="stot-label">En sist. s/físico</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card-title">Puntos obtenidos</div>
+      <div style="font-size:32px;font-weight:600;font-family:'DM Mono',monospace;color:${scoreColor(d.score)}">${d.pts}<span style="font-size:16px;color:var(--text-tertiary);font-weight:400">/${d.total}</span></div>
+      <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">${d.items.filter(v=>v==='NO').length} ítem${d.items.filter(v=>v==='NO').length!==1?'s':''} no conforme${d.items.filter(v=>v==='NO').length!==1?'s':''}</div>
+    </div>
+  </div>
+
+  ${sectoresHTML}
+  ${motosHTML}
+  `;
+}
+
+// Init
+document.getElementById('topDate').textContent = new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+buildSelect();
+renderResumen();
+</script>
+</body>
+</html>
