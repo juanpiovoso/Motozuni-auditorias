@@ -8,7 +8,6 @@
 <meta property="og:image" content="https://motozuni-auditorias.netlify.app/og-image.png">
 <meta property="og:title" content="Motozuni · Auditorías">
 <meta property="og:description" content="Dashboard de auditorías de sucursales">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #F0EEE9;
@@ -26,22 +25,24 @@
   --yellow-bg: #FFFBEB;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+body { font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
 
 /* TOPBAR */
-.topbar { background: var(--text-primary); padding: 0 2rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.topbar-brand { font-size: 13px; font-weight: 600; color: #fff; letter-spacing: 1.5px; text-transform: uppercase; }
-.topbar-label { font-size: 11px; color: #888; font-family: 'DM Mono', monospace; }
+.topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.topbar-brand { font-size: 13px; font-weight: 600; color: var(--text-primary); letter-spacing: 1.5px; text-transform: uppercase; }
+.topbar-label { font-size: 11px; color: var(--text-tertiary); font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 
 /* SELECTOR BAR — desplegable */
-.selector-bar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 1rem; height: 52px; }
+.selector-bar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 1rem; height: 52px; flex-wrap: wrap; row-gap: 6px; }
 .sel-label { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; white-space: nowrap; }
+.sel-divider { width: 1px; height: 22px; background: var(--border); margin: 0 2px; }
+.sel-label-sec { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 500; white-space: nowrap; }
 .sel-select {
   padding: 6px 32px 6px 12px;
   border-radius: 20px;
   border: 1px solid var(--border);
   background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23A39F97'/%3E%3C/svg%3E") no-repeat right 12px center;
-  font-family: 'DM Sans', sans-serif;
+  font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
@@ -53,6 +54,23 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   min-width: 160px;
 }
 .sel-select:focus { border-color: var(--accent); }
+.sel-select-sec {
+  padding: 4px 26px 4px 10px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23A39F97'/%3E%3C/svg%3E") no-repeat right 10px center;
+  font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 130px;
+}
+.sel-select-sec:focus { border-color: var(--accent); }
 
 /* LAYOUT */
 .content-wrap { display: flex; gap: 0; max-width: 1100px; margin: 0 auto; }
@@ -77,7 +95,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   display: flex; flex-direction: column;
   width: 100%; padding: 10px 1rem;
   border: none; background: transparent;
-  font-family: 'DM Sans', sans-serif;
+  font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
   cursor: pointer; text-align: left;
   border-left: 3px solid transparent;
   transition: all 0.12s;
@@ -86,7 +104,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .visita-btn:hover { background: var(--bg); }
 .visita-btn.active { border-left-color: var(--accent); background: var(--bg); }
 .visita-fecha { font-size: 12px; font-weight: 600; color: var(--text-primary); }
-.visita-score { font-size: 11px; font-family: 'DM Mono', monospace; }
+.visita-score { font-size: 11px; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 
 /* MAIN */
 .main { padding: 1.5rem 2rem 3rem; flex: 1; min-width: 0; }
@@ -95,7 +113,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .kpi-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1.5rem; }
 .kpi-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
 .kpi-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 5px; }
-.kpi-val { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.kpi-val { font-size: 26px; font-weight: 600; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 .kpi-val.green { color: var(--green); }
 .kpi-val.yellow { color: var(--yellow); }
 .kpi-val.red { color: var(--red); }
@@ -106,18 +124,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .resumen-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
 .resumen-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(26,63,219,0.1); }
 .res-local { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
-.res-meta { font-size: 11px; color: var(--text-tertiary); font-family: 'DM Mono', monospace; margin-bottom: 10px; }
+.res-meta { font-size: 11px; color: var(--text-tertiary); font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; margin-bottom: 10px; }
 
 /* Historial de scores en tarjeta resumen */
 .res-historial { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 10px; }
 .res-hist-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-.res-hist-score { font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.res-hist-score { font-size: 13px; font-weight: 600; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 .res-hist-fecha { font-size: 9px; color: var(--text-tertiary); }
 .res-hist-sep { width: 1px; height: 28px; background: var(--border); align-self: center; }
 
 .res-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
 .res-bar-fill { height: 100%; border-radius: 2px; }
-.res-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 10px; font-family: 'DM Mono', monospace; }
+.res-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 10px; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 .tag-green { background: var(--green-bg); color: var(--green); }
 .tag-yellow { background: var(--yellow-bg); color: var(--yellow); }
 .tag-red { background: var(--red-bg); color: var(--red); }
@@ -128,14 +146,14 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .header-card { background: var(--text-primary); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .header-meta { display: flex; flex-direction: column; gap: 4px; }
 .header-sucursal { font-size: 22px; font-weight: 600; color: #fff; }
-.header-sub { font-size: 12px; color: #888; font-family: 'DM Mono', monospace; }
+.header-sub { font-size: 12px; color: #888; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 .header-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
 .badge-green { background: #14532D; color: #4ADE80; }
 .badge-yellow { background: #78350F; color: #FCD34D; }
 .badge-red { background: #7F1D1D; color: #FCA5A5; }
 .score-circle { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #333; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
-.score-num-big { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; line-height: 1; }
+.score-num-big { font-size: 26px; font-weight: 600; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; line-height: 1; }
 .score-den { font-size: 10px; color: #666; margin-top: 2px; }
 .score-lbl { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 3px; }
 
@@ -151,7 +169,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .sector-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.9px; color: var(--text-tertiary); margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
 .sector-title-left { display: flex; align-items: center; gap: 8px; }
 .sector-title-left::before { content: ''; width: 3px; height: 12px; background: var(--accent); border-radius: 2px; }
-.sector-badge { font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 10px; font-family: 'DM Mono', monospace; }
+.sector-badge { font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 10px; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 
 .item-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px; }
 .item-row:last-child { margin-bottom: 0; }
@@ -162,7 +180,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .item-content { flex: 1; min-width: 0; }
 .item-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
 .item-obs { font-size: 11px; color: var(--text-secondary); font-style: italic; margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(0,0,0,0.06); }
-.item-pts { font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 600; flex-shrink: 0; white-space: nowrap; }
+.item-pts { font-size: 11px; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; font-weight: 600; flex-shrink: 0; white-space: nowrap; }
 .pts-ok { color: var(--green); }
 .pts-no { color: var(--red); }
 .pts-nd { color: var(--text-tertiary); }
@@ -170,7 +188,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 /* Stock */
 .stock-totals { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 1rem; }
 .stock-total-item { background: #F5F4F0; border-radius: 8px; padding: 10px 12px; text-align: center; }
-.stot-num { font-size: 22px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text-primary); }
+.stot-num { font-size: 22px; font-weight: 600; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; color: var(--text-primary); }
 .stot-num.red { color: var(--red); }
 .stot-num.yellow { color: #D97706; }
 .stot-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
@@ -179,11 +197,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .stock-table th { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-tertiary); text-align: left; padding: 0 8px 8px; border-bottom: 1px solid var(--border); }
 .stock-table td { padding: 9px 8px; font-size: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .stock-table tr:last-child td { border-bottom: none; }
-.chasis { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-secondary); }
+.chasis { font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; font-size: 11px; color: var(--text-secondary); }
 .obs-tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 500; }
 .tag-pending { background: var(--yellow-bg); color: var(--yellow); }
 
-.page-footer { text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 2rem; font-family: 'DM Mono', monospace; }
+.page-footer { text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 2rem; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 .empty-state { text-align: center; padding: 3rem; color: var(--text-tertiary); font-size: 13px; }
 
 @media(max-width:700px) {
@@ -206,6 +224,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   <span class="sel-label">Local</span>
   <select class="sel-select" id="sel-locales" onchange="onSelectLocal(this.value)">
     <option value="todos">Todos los locales</option>
+  </select>
+
+  <div class="sel-divider"></div>
+
+  <span class="sel-label-sec">Enc. ADM</span>
+  <select class="sel-select-sec" id="sel-encargado" onchange="onSelectEncargado(this.value)">
+    <option value="todos">Todos</option>
+  </select>
+
+  <span class="sel-label-sec">Enc. general</span>
+  <select class="sel-select-sec" id="sel-general" onchange="onSelectGeneral(this.value)">
+    <option value="todos">Todos</option>
   </select>
 </div>
 
@@ -279,6 +309,16 @@ const DATA = [{"sucursal": "LOMAS DE ZAMORA", "supervisor": "MIGUEL SILVA", "enc
 // ============ ESTADO ============
 let selLocal = 'todos';
 let selFecha = null;
+let selEncargado = 'todos';
+let selGeneral = 'todos';
+
+// ============ FILTRO ============
+function getFilteredData(){
+  return DATA.filter(d =>
+    (selEncargado === 'todos' || d.encargado === selEncargado) &&
+    (selGeneral === 'todos' || d.general === selGeneral)
+  );
+}
 
 // ============ HELPERS ============
 function fmtF(f){ const d=new Date(f+'T12:00:00'); return d.getDate().toString().padStart(2,'0')+'/'+((d.getMonth()+1)+'').padStart(2,'0'); }
@@ -287,9 +327,9 @@ function scoreColor(s){ return s>=9?'var(--green)':s>=7?'var(--yellow)':'var(--r
 function scoreCls(s){ return s>=9?'green':s>=7?'yellow':'red'; }
 function scoreTagCls(s){ return s>=9?'tag-green':s>=7?'tag-yellow':'tag-red'; }
 function scoreTagTxt(s){ return s>=9?'En orden':s>=7?'Revisar':'Atención'; }
-function getLocales(){ return [...new Set(DATA.map(d=>d.sucursal))].sort(); }
-function getFechasLocal(local){ return [...new Set(DATA.filter(d=>d.sucursal===local).map(d=>d.fecha))].sort((a,b)=>new Date(b)-new Date(a)); }
-function getAuditoria(local,fecha){ return DATA.find(d=>d.sucursal===local&&d.fecha===fecha); }
+function getLocales(){ return [...new Set(getFilteredData().map(d=>d.sucursal))].sort(); }
+function getFechasLocal(local){ return [...new Set(getFilteredData().filter(d=>d.sucursal===local).map(d=>d.fecha))].sort((a,b)=>new Date(b)-new Date(a)); }
+function getAuditoria(local,fecha){ return getFilteredData().find(d=>d.sucursal===local&&d.fecha===fecha); }
 
 // ============ BUILD SELECT ============
 function buildSelect(){
@@ -299,6 +339,38 @@ function buildSelect(){
     opt.value = l; opt.textContent = l;
     sel.appendChild(opt);
   });
+
+  const selEnc = document.getElementById('sel-encargado');
+  [...new Set(DATA.map(d=>d.encargado).filter(Boolean))].sort().forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n; opt.textContent = n;
+    selEnc.appendChild(opt);
+  });
+
+  const selGen = document.getElementById('sel-general');
+  [...new Set(DATA.map(d=>d.general).filter(Boolean))].sort().forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n; opt.textContent = n;
+    selGen.appendChild(opt);
+  });
+}
+
+function onSelectEncargado(val){
+  selEncargado = val;
+  refreshView();
+}
+
+function onSelectGeneral(val){
+  selGeneral = val;
+  refreshView();
+}
+
+function refreshView(){
+  if(selLocal === 'todos'){
+    renderResumen();
+  } else {
+    onSelectLocal(selLocal);
+  }
 }
 
 function onSelectLocal(val){
@@ -314,7 +386,7 @@ function onSelectLocal(val){
   } else {
     const fechas = getFechasLocal(val);
     vList.innerHTML = fechas.map((f,i) => {
-      const row = DATA.find(d=>d.sucursal===val&&d.fecha===f);
+      const row = getFilteredData().find(d=>d.sucursal===val&&d.fecha===f);
       return `<button class="visita-btn${i===0?' active':''}" onclick="setFecha('${f}',this)">
         <span class="visita-fecha">${fmtFull(f)}</span>
         <span class="visita-score" style="color:${row?scoreColor(row.score):'var(--text-tertiary)'}">${row?row.score:''}/10</span>
@@ -339,10 +411,11 @@ function renderResumen(){
   document.getElementById('view-detalle').style.display='none';
 
   const locales = getLocales();
-  const total = DATA.length;
-  const prom = (DATA.reduce((s,d)=>s+d.score,0)/total).toFixed(1);
-  const nc = DATA.reduce((s,d)=>s+d.items.filter(v=>v==='NO').length,0);
-  const bajos = DATA.filter(d=>d.score<7).length;
+  const fdata = getFilteredData();
+  const total = fdata.length;
+  const prom = total ? (fdata.reduce((s,d)=>s+d.score,0)/total).toFixed(1) : '0.0';
+  const nc = fdata.reduce((s,d)=>s+d.items.filter(v=>v==='NO').length,0);
+  const bajos = fdata.filter(d=>d.score<7).length;
 
   document.getElementById('kpi-strip').innerHTML = `
     <div class="kpi-box"><div class="kpi-lbl">Auditorías</div><div class="kpi-val">${total}</div><div class="kpi-sub">${locales.length} locales</div></div>
@@ -353,8 +426,8 @@ function renderResumen(){
 
   document.getElementById('sec-lbl').textContent = `${locales.length} locales`;
 
-  document.getElementById('resumen-grid').innerHTML = locales.map(local => {
-    const rows = DATA.filter(d=>d.sucursal===local).sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+  document.getElementById('resumen-grid').innerHTML = total === 0 ? '<div class="empty-state">No hay auditorías para esta combinación de filtros.</div>' : locales.map(local => {
+    const rows = fdata.filter(d=>d.sucursal===local).sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
     const prom = (rows.reduce((s,d)=>s+d.score,0)/rows.length).toFixed(1);
     const pct = (parseFloat(prom)/10*100).toFixed(0);
 
@@ -371,7 +444,7 @@ function renderResumen(){
     return `
     <div class="resumen-card" onclick="clickLocalCard('${local}')">
       <div class="res-local">${local}</div>
-      <div class="res-meta">${rows.length} visita${rows.length!==1?'s':''}${rows[0].general?' · Gral: '+rows[0].general:rows[0].encargado?' · Enc: '+rows[0].encargado:''}</div>
+      <div class="res-meta">${rows.length} visita${rows.length!==1?'s':''}${rows[0].encargado?' · ADM: '+rows[0].encargado:''}</div>
       <div class="res-historial">${histHTML}</div>
       <div class="res-bar"><div class="res-bar-fill" style="width:${pct}%;background:${scoreColor(parseFloat(prom))}"></div></div>
       <span class="res-tag ${scoreTagCls(parseFloat(prom))}">${scoreTagTxt(parseFloat(prom))}</span>
@@ -482,7 +555,7 @@ function renderDetalle(local, fecha){
     </div>
     <div>
       <div class="card-title">Puntos obtenidos</div>
-      <div style="font-size:32px;font-weight:600;font-family:'DM Mono',monospace;color:${scoreColor(d.score)}">${d.pts}<span style="font-size:16px;color:var(--text-tertiary);font-weight:400">/${d.total}</span></div>
+      <div style="font-size:32px;font-weight:600;font-family:'Calibri';color:${scoreColor(d.score)}">${d.pts}<span style="font-size:16px;color:var(--text-tertiary);font-weight:400">/${d.total}</span></div>
       <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">${d.items.filter(v=>v==='NO').length} ítem${d.items.filter(v=>v==='NO').length!==1?'s':''} no conforme${d.items.filter(v=>v==='NO').length!==1?'s':''}</div>
     </div>
   </div>
