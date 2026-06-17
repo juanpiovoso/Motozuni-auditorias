@@ -33,7 +33,8 @@ body { font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-ser
 .topbar-label { font-size: 11px; color: var(--text-tertiary); font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 
 /* SELECTOR BAR — desplegable */
-.selector-bar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 1rem; height: 52px; flex-wrap: wrap; row-gap: 6px; }
+.selector-bar { background: var(--card); border-bottom: 1px solid var(--border); padding: 10px 2rem; display: flex; align-items: center; gap: 1rem; min-height: 52px; flex-wrap: wrap; row-gap: 10px; }
+.filtro-grupo { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
 .sel-label { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; white-space: nowrap; }
 .sel-divider { width: 1px; height: 22px; background: var(--border); margin: 0 2px; }
 .sel-label-sec { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 500; white-space: nowrap; }
@@ -209,7 +210,10 @@ body { font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-ser
   .main { padding: 1rem; }
   .stock-totals { grid-template-columns: repeat(2,1fr); }
   .kpi-strip { grid-template-columns: repeat(2,1fr); }
-  .selector-bar { padding: 0 1rem; }
+  .selector-bar { padding: 10px 1rem; }
+  .sel-divider { display: none; }
+  .filtro-grupo { width: 100%; }
+  .filtro-grupo .sel-select, .filtro-grupo .sel-select-sec { flex: 1; min-width: 0; }
 }
 </style>
 </head>
@@ -221,22 +225,28 @@ body { font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-ser
 </div>
 
 <div class="selector-bar">
-  <span class="sel-label">Local</span>
-  <select class="sel-select" id="sel-locales" onchange="onSelectLocal(this.value)">
-    <option value="todos">Todos los locales</option>
-  </select>
+  <div class="filtro-grupo">
+    <span class="sel-label">Local</span>
+    <select class="sel-select" id="sel-locales" onchange="onSelectLocal(this.value)">
+      <option value="todos">Todos los locales</option>
+    </select>
+  </div>
 
   <div class="sel-divider"></div>
 
-  <span class="sel-label-sec">Administrativo</span>
-  <select class="sel-select-sec" id="sel-encargado" onchange="onSelectEncargado(this.value)">
-    <option value="todos">Todos</option>
-  </select>
+  <div class="filtro-grupo">
+    <span class="sel-label-sec">Administrativo</span>
+    <select class="sel-select-sec" id="sel-encargado" onchange="onSelectEncargado(this.value)">
+      <option value="todos">Todos</option>
+    </select>
+  </div>
 
-  <span class="sel-label-sec">General</span>
-  <select class="sel-select-sec" id="sel-general" onchange="onSelectGeneral(this.value)">
-    <option value="todos">Todos</option>
-  </select>
+  <div class="filtro-grupo">
+    <span class="sel-label-sec">General</span>
+    <select class="sel-select-sec" id="sel-general" onchange="onSelectGeneral(this.value)">
+      <option value="todos">Todos</option>
+    </select>
+  </div>
 </div>
 
 <div class="content-wrap">
