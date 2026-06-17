@@ -14,8 +14,8 @@
   --card: #FAFAF8;
   --border: #E2DED6;
   --text-primary: #1A1916;
-  --text-secondary: #6B6760;
-  --text-tertiary: #A39F97;
+  --text-secondary: #57534C;
+  --text-tertiary: #87827A;
   --accent: #1A3FDB;
   --green: #1A6B3A;
   --green-bg: #E8F5EE;
@@ -143,19 +143,19 @@ body { font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-ser
 /* DETALLE */
 #view-detalle { display: none; }
 
-.header-card { background: var(--text-primary); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.header-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .header-meta { display: flex; flex-direction: column; gap: 4px; }
-.header-sucursal { font-size: 22px; font-weight: 600; color: #fff; }
-.header-sub { font-size: 12px; color: #888; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
+.header-sucursal { font-size: 22px; font-weight: 600; color: var(--text-primary); }
+.header-sub { font-size: 12px; color: var(--text-tertiary); font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; }
 .header-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-.badge-green { background: #14532D; color: #4ADE80; }
-.badge-yellow { background: #78350F; color: #FCD34D; }
-.badge-red { background: #7F1D1D; color: #FCA5A5; }
-.score-circle { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #333; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-yellow { background: var(--yellow-bg); color: var(--yellow); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.score-circle { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
 .score-num-big { font-size: 26px; font-weight: 600; font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif; line-height: 1; }
-.score-den { font-size: 10px; color: #666; margin-top: 2px; }
-.score-lbl { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 3px; }
+.score-den { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+.score-lbl { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 3px; }
 
 /* Card */
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; }
@@ -228,12 +228,12 @@ body { font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-ser
 
   <div class="sel-divider"></div>
 
-  <span class="sel-label-sec">Enc. ADM</span>
+  <span class="sel-label-sec">Administrativo</span>
   <select class="sel-select-sec" id="sel-encargado" onchange="onSelectEncargado(this.value)">
     <option value="todos">Todos</option>
   </select>
 
-  <span class="sel-label-sec">Enc. general</span>
+  <span class="sel-label-sec">General</span>
   <select class="sel-select-sec" id="sel-general" onchange="onSelectGeneral(this.value)">
     <option value="todos">Todos</option>
   </select>
@@ -313,10 +313,64 @@ let selEncargado = 'todos';
 let selGeneral = 'todos';
 
 // ============ FILTRO ============
+function quitarTildes(s){ return s.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+function claveNombre(s){ return quitarTildes((s||'').trim().toLowerCase()); }
+function tituloCase(s){
+  if(!s) return '';
+  return s.trim().toLowerCase().split(/\s+/).map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+}
+// Equivalencias confirmadas a mano (nombre/apellido invertido o error de tipeo) — confirmado 16/06.
+// Clave = claveNombre(variante), valor = nombre canónico a mostrar.
+const EQUIVALENCIAS_NOMBRES = {
+  'patricio infante': 'Patricio Infante',
+  'infante patricio': 'Patricio Infante',
+  'altamirano gonzalo': 'Gonzalo Altamirano',
+  'gonzalo altamirano': 'Gonzalo Altamirano',
+  'ibarra roberto': 'Roberto Ibarra',
+  'roberto ibarra': 'Roberto Ibarra',
+  'chaparro pamela': 'Pamela Chaparro',
+  'pamela chaparro': 'Pamela Chaparro',
+  'raponi juan manuel': 'Juan Manuel Raponi',
+  'juan raponi': 'Juan Manuel Raponi',
+  'lombardo brian': 'Brian Lombardo',
+  'braian lombardo': 'Brian Lombardo',
+  'puenzo maria -': 'María Puenzo',
+  'puenzo maria': 'María Puenzo',
+  'rocha agustina': 'Agustina Rocha',
+  'agustina rocha': 'Agustina Rocha',
+};
+// Para cada persona (agrupada por nombre sin tildes/mayúsculas), elige la mejor variante para mostrar:
+// 1) si hay una equivalencia manual confirmada, esa gana siempre.
+// 2) si no, prioriza la variante que tenga tildes, asumiendo que quien la tipeó así lo hizo bien.
+function construirMapaNombres(valores){
+  const mapa = {};
+  valores.filter(Boolean).forEach(raw => {
+    const key = claveNombre(raw);
+    if(EQUIVALENCIAS_NOMBRES[key]){ mapa[key] = EQUIVALENCIAS_NOMBRES[key]; return; }
+    const display = tituloCase(raw);
+    const actual = mapa[key];
+    if(!actual) { mapa[key] = display; return; }
+    const actualTieneTildes = quitarTildes(actual) !== actual;
+    const nuevoTieneTildes = quitarTildes(display) !== display;
+    if(nuevoTieneTildes && !actualTieneTildes) mapa[key] = display;
+  });
+  return mapa;
+}
+let MAPA_ENCARGADOS = {};
+let MAPA_GENERALES = {};
+function etiquetaEncargado(raw){ if(!raw) return ''; return MAPA_ENCARGADOS[claveNombre(raw)] || tituloCase(raw); }
+function etiquetaGeneral(raw){ if(!raw) return ''; return MAPA_GENERALES[claveNombre(raw)] || tituloCase(raw); }
+// Resuelve la clave "real" de comparación: si el nombre tiene una equivalencia manual confirmada
+// (nombre/apellido invertido, typo, etc.), compara por la clave del nombre canónico, no por el texto crudo.
+function claveCanonica(raw){
+  const key = claveNombre(raw);
+  return EQUIVALENCIAS_NOMBRES[key] ? claveNombre(EQUIVALENCIAS_NOMBRES[key]) : key;
+}
+
 function getFilteredData(){
   return DATA.filter(d =>
-    (selEncargado === 'todos' || d.encargado === selEncargado) &&
-    (selGeneral === 'todos' || d.general === selGeneral)
+    (selEncargado === 'todos' || claveCanonica(d.encargado) === claveCanonica(selEncargado)) &&
+    (selGeneral === 'todos' || claveCanonica(d.general) === claveCanonica(selGeneral))
   );
 }
 
@@ -331,37 +385,63 @@ function getLocales(){ return [...new Set(getFilteredData().map(d=>d.sucursal))]
 function getFechasLocal(local){ return [...new Set(getFilteredData().filter(d=>d.sucursal===local).map(d=>d.fecha))].sort((a,b)=>new Date(b)-new Date(a)); }
 function getAuditoria(local,fecha){ return getFilteredData().find(d=>d.sucursal===local&&d.fecha===fecha); }
 
-// ============ BUILD SELECT ============
-function buildSelect(){
-  const sel = document.getElementById('sel-locales');
-  getLocales().forEach(l => {
+// ============ BUILD SELECT (con filtros cruzados) ============
+// Devuelve el subconjunto de DATA aplicando todos los filtros activos EXCEPTO el indicado en "excluir".
+// Sirve para calcular qué opciones tienen sentido ofrecer en cada select, en base a los otros dos.
+function datosPara(excluir){
+  return DATA.filter(d => {
+    const pasaLocal = excluir==='local' || selLocal==='todos' || d.sucursal===selLocal;
+    const pasaEnc = excluir==='encargado' || selEncargado==='todos' || claveCanonica(d.encargado)===claveCanonica(selEncargado);
+    const pasaGen = excluir==='general' || selGeneral==='todos' || claveCanonica(d.general)===claveCanonica(selGeneral);
+    return pasaLocal && pasaEnc && pasaGen;
+  });
+}
+
+function rellenarSelect(id, opciones, valorActual, etiquetaTodos){
+  const sel = document.getElementById(id);
+  sel.innerHTML = '';
+  const optTodos = document.createElement('option');
+  optTodos.value = 'todos'; optTodos.textContent = etiquetaTodos;
+  sel.appendChild(optTodos);
+  opciones.forEach(o => {
     const opt = document.createElement('option');
-    opt.value = l; opt.textContent = l;
+    opt.value = o; opt.textContent = o;
     sel.appendChild(opt);
   });
+  sel.value = valorActual;
+}
 
-  const selEnc = document.getElementById('sel-encargado');
-  [...new Set(DATA.map(d=>d.encargado).filter(Boolean))].sort().forEach(n => {
-    const opt = document.createElement('option');
-    opt.value = n; opt.textContent = n;
-    selEnc.appendChild(opt);
-  });
+// Recalcula las opciones de los 3 selects según los filtros activos, y si la selección
+// vigente de alguno ya no tiene sentido con la nueva combinación, la resetea a "todos".
+function sincronizarFiltros(){
+  const locOpts = [...new Set(datosPara('local').map(d=>d.sucursal))].sort();
+  const encOpts = [...new Set(datosPara('encargado').map(d=>d.encargado).filter(Boolean).map(raw=>MAPA_ENCARGADOS[claveNombre(raw)] || tituloCase(raw)))].sort();
+  const genOpts = [...new Set(datosPara('general').map(d=>d.general).filter(Boolean).map(raw=>MAPA_GENERALES[claveNombre(raw)] || tituloCase(raw)))].sort();
 
-  const selGen = document.getElementById('sel-general');
-  [...new Set(DATA.map(d=>d.general).filter(Boolean))].sort().forEach(n => {
-    const opt = document.createElement('option');
-    opt.value = n; opt.textContent = n;
-    selGen.appendChild(opt);
-  });
+  if(selLocal !== 'todos' && !locOpts.includes(selLocal)) selLocal = 'todos';
+  if(selEncargado !== 'todos' && !encOpts.includes(selEncargado)) selEncargado = 'todos';
+  if(selGeneral !== 'todos' && !genOpts.includes(selGeneral)) selGeneral = 'todos';
+
+  rellenarSelect('sel-locales', locOpts, selLocal, 'Todos los locales');
+  rellenarSelect('sel-encargado', encOpts, selEncargado, 'Todos');
+  rellenarSelect('sel-general', genOpts, selGeneral, 'Todos');
+}
+
+function buildSelect(){
+  MAPA_ENCARGADOS = construirMapaNombres(DATA.map(d=>d.encargado));
+  MAPA_GENERALES = construirMapaNombres(DATA.map(d=>d.general));
+  sincronizarFiltros();
 }
 
 function onSelectEncargado(val){
   selEncargado = val;
+  sincronizarFiltros();
   refreshView();
 }
 
 function onSelectGeneral(val){
   selGeneral = val;
+  sincronizarFiltros();
   refreshView();
 }
 
@@ -376,17 +456,18 @@ function refreshView(){
 function onSelectLocal(val){
   selLocal = val;
   selFecha = null;
+  sincronizarFiltros();
   const sidebar = document.getElementById('visitas-sidebar');
   const vList = document.getElementById('visitas-list');
 
-  if(val === 'todos'){
+  if(selLocal === 'todos'){
     sidebar.classList.remove('visible');
     vList.innerHTML = '';
     renderResumen();
   } else {
-    const fechas = getFechasLocal(val);
+    const fechas = getFechasLocal(selLocal);
     vList.innerHTML = fechas.map((f,i) => {
-      const row = getFilteredData().find(d=>d.sucursal===val&&d.fecha===f);
+      const row = getFilteredData().find(d=>d.sucursal===selLocal&&d.fecha===f);
       return `<button class="visita-btn${i===0?' active':''}" onclick="setFecha('${f}',this)">
         <span class="visita-fecha">${fmtFull(f)}</span>
         <span class="visita-score" style="color:${row?scoreColor(row.score):'var(--text-tertiary)'}">${row?row.score:''}/10</span>
@@ -394,8 +475,9 @@ function onSelectLocal(val){
     }).join('');
     sidebar.classList.add('visible');
     selFecha = fechas[0];
-    renderDetalle(val, fechas[0]);
+    renderDetalle(selLocal, fechas[0]);
   }
+
 }
 
 function setFecha(fecha, btn){
@@ -444,7 +526,7 @@ function renderResumen(){
     return `
     <div class="resumen-card" onclick="clickLocalCard('${local}')">
       <div class="res-local">${local}</div>
-      <div class="res-meta">${rows.length} visita${rows.length!==1?'s':''}${rows[0].encargado?' · ADM: '+rows[0].encargado:''}</div>
+      <div class="res-meta">${rows.length} visita${rows.length!==1?'s':''}${rows[0].encargado?' · ADM: '+etiquetaEncargado(rows[0].encargado):''}</div>
       <div class="res-historial">${histHTML}</div>
       <div class="res-bar"><div class="res-bar-fill" style="width:${pct}%;background:${scoreColor(parseFloat(prom))}"></div></div>
       <span class="res-tag ${scoreTagCls(parseFloat(prom))}">${scoreTagTxt(parseFloat(prom))}</span>
@@ -481,7 +563,7 @@ function renderDetalle(local, fecha){
     `<span class="badge badge-${st==='ok'?'green':'yellow'}">${sec} ${st==='ok'?'✓':'✗'}</span>`
   ).join('');
 
-  const circleColor = d.score>=9?'#4ADE80':d.score>=7?'#FCD34D':'#FCA5A5';
+  const circleColor = d.score>=9?'var(--green)':d.score>=7?'var(--yellow)':'var(--red)';
 
   // Sectores con ítems y observaciones
   let sectoresHTML = '';
@@ -532,8 +614,8 @@ function renderDetalle(local, fecha){
   <div class="header-card">
     <div class="header-meta">
       <div class="header-sucursal">${d.sucursal}</div>
-      <div class="header-sub">Supervisor: ${d.supervisor}${d.encargado?' · Auditado: '+d.encargado:''} · ${fmtFull(d.fecha)}</div>
-      ${(d.general||d.asistentes)?'<div class="header-sub" style="margin-top:3px">'+( d.general?'General: '+d.general:'')+(d.asistentes?' &nbsp;·&nbsp; Asistentes: '+d.asistentes:'')+'</div>':''}
+      <div class="header-sub">Supervisor: ${d.supervisor}${d.encargado?' · Auditado: '+etiquetaEncargado(d.encargado):''} · ${fmtFull(d.fecha)}</div>
+      ${(d.general||d.asistentes)?'<div class="header-sub" style="margin-top:3px">'+( d.general?'General: '+etiquetaGeneral(d.general):'')+(d.asistentes?' &nbsp;·&nbsp; Asistentes: '+d.asistentes:'')+'</div>':''}
       <div class="header-badges">${badgesHTML}</div>
     </div>
     <div class="score-circle">
