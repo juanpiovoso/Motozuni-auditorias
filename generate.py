@@ -178,10 +178,15 @@ def generate_html(auditorias):
     template_path = os.path.join(os.path.dirname(__file__), "template.html")
     if os.path.exists(template_path):
         html = open(template_path, encoding="utf-8").read()
-        # Reemplazar el bloque DATA entre los marcadores
+        # Reemplazar el bloque DATA entre los marcadores.
+        # IMPORTANTE: el reemplazo se pasa como función (lambda), no como string.
+        # Si se pasa como string, re.sub reinterpreta las secuencias \n, \\, etc.
+        # que json.dumps ya había escapado correctamente dentro de data_js,
+        # rompiendo el JSON cuando una observación tiene saltos de línea reales
+        # (ej: textos largos escritos en varios renglones en el Sheet).
         html = re.sub(
             r'// ===DATA_START===.*?// ===DATA_END===',
-            f'// ===DATA_START===\nconst DATA = {data_js};\n// ===DATA_END===',
+            lambda m: f'// ===DATA_START===\nconst DATA = {data_js};\n// ===DATA_END===',
             html,
             flags=re.DOTALL
         )
